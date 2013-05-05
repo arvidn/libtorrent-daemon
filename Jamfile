@@ -1,0 +1,30 @@
+import modules ;
+
+BOOST_ROOT = [ modules.peek : BOOST_ROOT ] ;
+
+use-project /torrent : ../libtorrent_aio ;
+use-project /torrent-webui : ../libtorrent-webui ;
+
+if $(BOOST_ROOT)
+{
+	use-project /boost : $(BOOST_ROOT) ;
+}
+
+SOURCES = main ;
+
+exe libtorrent-daemon
+	: # sources
+	$(SOURCES).cpp
+
+	: # requirements
+	<library>/torrent//torrent
+	<library>/torrent-webui//torrent-webui
+	<toolset>gcc:<linkflags>-export-dynamic
+	<toolset>gcc:<linkflags>-rdynamic
+	<toolset>gcc:<cxxflags>-rdynamic
+
+	: # default build
+	<link>static
+
+	;
+
