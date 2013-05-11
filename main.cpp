@@ -205,6 +205,10 @@ struct error_logger : libtorrent::alert_observer
 					&& pd->error != error_code(336027900, boost::asio::error::get_ssl_category())
 #endif
 					&& pd->error != error_code(libtorrent::errors::self_connection)
+					&& pd->error != error_code(libtorrent::errors::torrent_removed)
+					&& pd->error != error_code(libtorrent::errors::torrent_aborted)
+					&& pd->error != error_code(libtorrent::errors::stopping_torrent)
+					&& pd->error != error_code(libtorrent::errors::session_closing)
 					&& pd->error != error_code(libtorrent::errors::duplicate_peer_id)
 					&& pd->error != error_code(libtorrent::errors::timed_out)
 					&& pd->error != error_code(libtorrent::errors::timed_out_no_handshake)
