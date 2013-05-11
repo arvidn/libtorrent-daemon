@@ -125,19 +125,38 @@ void print_usage()
 
 struct error_logger : libtorrent::alert_observer
 {
-	error_logger(std::string const& log_file, bool redirect_stderr)
+	error_logger(alert_handler* alerts, std::string const& log_file, bool redirect_stderr)
 		: m_file(NULL)
+		, m_alerts(alerts)
 	{
 		if (!log_file.empty())
 		{
 			m_file = fopen(log_file.c_str(), "a");
-			if (m_file == NULL) fprintf(stderr, "failed to open error log: (%d) %s\n", errno, strerror(errno));
+			if (m_file == NULL)
+			{
+				fprintf(stderr, "failed to open error log \"%s\": (%d) %s\n"
+					, log_file.c_str(), errno, strerror(errno));
+			}
 			else if (redirect_stderr)
 			{
 				dup2(fileno(m_file), STDOUT_FILENO);
 				dup2(fileno(m_file), STDERR_FILENO);
 			}
+			m_alerts->subscribe(this, 0
+				, peer_disconnected_alert::alert_type
+				, peer_error_alert::alert_type
+				, save_resume_data_failed_alert::alert_type
+				, torrent_delete_failed_alert::alert_type
+				, storage_moved_failed_alert::alert_type
+				, file_rename_failed_alert::alert_type
+				, 0);
 		}
+	}
+
+	~error_logger()
+	{
+		m_alerts->unsubscribe(this);
+		if (m_file) fclose(m_file);
 	}
 
 	void handle_alert(alert const* a)
@@ -230,10 +249,9 @@ struct error_logger : libtorrent::alert_observer
 		}
 	}
 
-	~error_logger() { if (m_file) fclose(m_file); }
-
 private:
 	FILE* m_file;
+	alert_handler* m_alerts;
 };
 
 int main(int argc, char *const argv[])
@@ -358,8 +376,7 @@ int main(int argc, char *const argv[])
 	p.save_path = sett.get_str("save_path", ".");
 	resume.load(ec, p);
 
-	error_logger el(error_log, daemonize);
-	alerts.subscribe(&el, 0, peer_disconnected_alert::alert_type, peer_error_alert::alert_type, 0);
+	error_logger el(&alerts, error_log, daemonize);
 
 	auto_load al(ses, &sett);
 
@@ -416,8 +433,6 @@ int main(int argc, char *const argv[])
 	}
 
 	if (debug_file) fclose(debug_file);
-
-	alerts.unsubscribe(&el);
 
 //	dlg.stop();
 	webport.stop();
