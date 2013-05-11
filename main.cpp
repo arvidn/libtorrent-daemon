@@ -377,6 +377,11 @@ int main(int argc, char *const argv[])
 	webport.add_handler(&whitelist);
 
 	webport.start(web_listen_port, cert.empty() ? NULL : cert.c_str(), 30);
+	if (!webport.is_running())
+	{
+		fprintf(stderr, "failed to start web server\n");
+		return 1;
+	}
 
 //	deluge dlg(ses, "server.pem");
 //	dlg.start(58846);
