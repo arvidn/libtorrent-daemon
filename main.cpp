@@ -214,7 +214,7 @@ int main(int argc, char *const argv[])
 	high_performance_seed(s);
 	ses.apply_settings(s);
 
-	alert_handler alerts;
+	alert_handler alerts(ses);
 
 	// start DHT
 	ses.add_dht_router(std::make_pair(
