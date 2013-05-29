@@ -45,6 +45,7 @@ struct limited_user : permissions_interface
 	virtual bool allow_start() const { return true; }
 	virtual bool allow_stop() const { return true; }
 	virtual bool allow_recheck() const { return true; }
+	virtual bool allow_set_file_prio() const { return true; }
 	virtual bool allow_list() const { return true; }
 	virtual bool allow_add() const { return true; }
 	virtual bool allow_remove() const { return true; }
