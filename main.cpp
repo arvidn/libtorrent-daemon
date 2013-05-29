@@ -276,6 +276,7 @@ int main(int argc, char *const argv[])
 
 	signal(SIGTERM, &sighandler);
 	signal(SIGINT, &sighandler);
+	signal(SIGPIPE, SIG_IGN);
 
 	std::deque<alert*> alert_queue;
 	bool shutting_down = false;
