@@ -10,6 +10,7 @@
 #include "load_config.hpp"
 #include "http_whitelist.hpp"
 #include "error_logger.hpp"
+#include "rss_filter.hpp"
 
 #include "libtorrent/session.hpp"
 #include "libtorrent/socket_io.hpp" // for print_endpoint
@@ -250,9 +251,10 @@ int main(int argc, char *const argv[])
 	error_logger el(&alerts, error_log, daemonize);
 
 	auto_load al(ses, &sett);
+	rss_filter_handler rss_filter(alerts, ses);
 
 	transmission_webui tr_handler(ses, &sett, &authorizer);
-	utorrent_webui ut_handler(ses, &sett, &al, &hist, &authorizer);
+	utorrent_webui ut_handler(ses, &sett, &al, &hist, &rss_filter, &authorizer);
 	file_downloader file_handler(ses, &authorizer);
 	http_whitelist whitelist;
 	whitelist.add_allowed_prefix("gui"); // for utorrent webui
