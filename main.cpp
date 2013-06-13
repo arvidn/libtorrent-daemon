@@ -59,9 +59,7 @@ struct limited_user : permissions_interface
 		if (name < 0) return false;
 
 		static int allowed_settings[] = {
-			settings_pack::upload_rate_limit
-			, settings_pack::download_rate_limit
-			, settings_pack::unchoke_slots_limit
+			settings_pack::unchoke_slots_limit
 			, settings_pack::dht_upload_rate_limit
 			, settings_pack::connections_limit
 			, settings_pack::share_ratio_limit
@@ -100,6 +98,8 @@ struct option cmd_line_options[] =
 	{"users",             required_argument,   NULL, 'u'},
 	{"error-log",         required_argument,   NULL, 'e'},
 	{"debug-log",         required_argument,   NULL, 1},
+	{"upload-rate",       required_argument,   NULL, 'U'},
+	{"download-rate",     required_argument,   NULL, 'D'},
 	{NULL,                0,                   NULL, 0}
 };
 
@@ -118,6 +118,8 @@ void print_usage()
 		"-s, --server-cert      <.pem filename>\n"
 		"-u, --users            <users filename>\n"
 		"-h, --help\n"
+		"    --download-rate    <bytes per second>\n"
+		"    --upload-rate      <bytes per second>\n"
 		"\n"
 		"user groups in user configuration file are defined as:\n"
 		"0: root user (full permissions)\n"
@@ -144,6 +146,9 @@ int main(int argc, char *const argv[])
 	std::string error_log;
 	std::string debug_log;
 
+	int download_rate = -1;
+	int upload_rate = -1;
+
 	int ch = 0;
 	while ((ch = getopt_long(argc, argv, "c:p:dl:w:i:s:hS:u:e:", cmd_line_options, NULL)) != -1)
 	{
@@ -160,6 +165,8 @@ int main(int argc, char *const argv[])
 			case 'u': users_file = optarg; break;
 			case 'e': error_log = optarg; break;
 			case 1: debug_log = optarg; break;
+			case 'D': download_rate = atoi(optarg); break;
+			case 'U': upload_rate = atoi(optarg); break;
 			default:
 				print_usage();
 				return 1;
@@ -235,6 +242,13 @@ int main(int argc, char *const argv[])
 		load_config(config_file, &ses, ec);
 		if (ec) fprintf(stderr, "failed to load config: %s\n", ec.message().c_str());
 	}
+
+	settings_pack pack;
+	if (upload_rate != -1)
+		pack.set_int(settings_pack::upload_rate_limit, upload_rate);
+	if (download_rate != -1)
+		pack.set_int(settings_pack::download_rate_limit, download_rate);
+	ses.apply_settings(pack);
 
 	if (!bind_interface.empty())
 	{
