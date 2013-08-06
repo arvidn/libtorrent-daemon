@@ -218,7 +218,10 @@ int main(int argc, char *const argv[])
 	session ses(fingerprint("ld", 0, 1, 0, 0)
 		, std::make_pair(listen_port, listen_port+1)
 		, listen_interface.c_str(), 0);
-	ses.set_alert_mask(~0);
+	// progress and debug alerts are very verbose and can easilty fill
+	// up the alert pipe
+	ses.set_alert_mask(~(alert::progress_notification | alert::debug_notification));
+
 	settings_pack s;
 	high_performance_seed(s);
 	ses.apply_settings(s);
