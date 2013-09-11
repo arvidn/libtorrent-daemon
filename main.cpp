@@ -100,6 +100,8 @@ struct option cmd_line_options[] =
 	{"debug-log",         required_argument,   NULL, 1},
 	{"upload-rate",       required_argument,   NULL, 'U'},
 	{"download-rate",     required_argument,   NULL, 'D'},
+	{"cache-size",        required_argument,   NULL, 'C'},
+	{"unchoke-slots",     required_argument,   NULL, 2},
 	{NULL,                0,                   NULL, 0}
 };
 
@@ -120,6 +122,8 @@ void print_usage()
 		"-h, --help\n"
 		"    --download-rate    <bytes per second>\n"
 		"    --upload-rate      <bytes per second>\n"
+		"-C, --cache-size       <max cache size in MiB>\n"
+		"    --unchoke-slots    <max unchoke slots>\n"
 		"\n"
 		"user groups in user configuration file are defined as:\n"
 		"0: root user (full permissions)\n"
@@ -139,15 +143,14 @@ int main(int argc, char *const argv[])
 	int web_listen_port = 8080;
 	std::string cert;
 	std::string listen_interface = "0.0.0.0";
-	std::string bind_interface;
 	std::string pid_file;
 	std::string save_path;
 	std::string users_file = "users.conf";
 	std::string error_log;
 	std::string debug_log;
 
-	int download_rate = -1;
-	int upload_rate = -1;
+	settings_pack s;
+	high_performance_seed(s);
 
 	int ch = 0;
 	while ((ch = getopt_long(argc, argv, "c:p:dl:w:i:s:hS:u:e:", cmd_line_options, NULL)) != -1)
@@ -157,7 +160,7 @@ int main(int argc, char *const argv[])
 			case 'c': config_file = optarg; break;
 			case 'd': daemonize = true; break;
 			case 'l': listen_port = atoi(optarg); break;
-			case 'i': bind_interface = optarg; listen_interface = optarg; break;
+			case 'i': s.set_str(settings_pack::outgoing_interfaces, optarg); listen_interface = optarg; break;
 			case 'w': web_listen_port = atoi(optarg); break;
 			case 's': cert = optarg; break;
 			case 'p': pid_file = optarg; break;
@@ -165,8 +168,10 @@ int main(int argc, char *const argv[])
 			case 'u': users_file = optarg; break;
 			case 'e': error_log = optarg; break;
 			case 1: debug_log = optarg; break;
-			case 'D': download_rate = atoi(optarg); break;
-			case 'U': upload_rate = atoi(optarg); break;
+			case 'D': s.set_int(settings_pack::download_rate_limit, atoi(optarg)); break;
+			case 'U': s.set_int(settings_pack::upload_rate_limit, atoi(optarg)); break;
+			case 'C': s.set_int(settings_pack::cache_size, atoi(optarg) * 64); break;
+			case 2: s.set_int(settings_pack::unchoke_slots_limit, atoi(optarg)); break;
 			default:
 				print_usage();
 				return 1;
@@ -222,10 +227,6 @@ int main(int argc, char *const argv[])
 	// up the alert pipe
 	ses.set_alert_mask(~(alert::progress_notification | alert::debug_notification));
 
-	settings_pack s;
-	high_performance_seed(s);
-	ses.apply_settings(s);
-
 	alert_handler alerts(ses);
 
 	// start DHT
@@ -246,17 +247,7 @@ int main(int argc, char *const argv[])
 		if (ec) fprintf(stderr, "failed to load config: %s\n", ec.message().c_str());
 	}
 
-	settings_pack pack;
-	if (upload_rate != -1)
-		pack.set_int(settings_pack::upload_rate_limit, upload_rate);
-	if (download_rate != -1)
-		pack.set_int(settings_pack::download_rate_limit, download_rate);
-	ses.apply_settings(pack);
-
-	if (!bind_interface.empty())
-	{
-		ses.use_interfaces(bind_interface.c_str());
-	}
+	ses.apply_settings(s);
 
 	torrent_history hist(&alerts);
 	save_resume resume(ses, ".resume", &alerts);
