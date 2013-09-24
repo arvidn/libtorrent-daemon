@@ -30,10 +30,24 @@ next to the libtorrentp-daemon directory.
 
 libtorrent in turn depend boost, and on openssl( in case it's built with encryption=openssl).
 
-To build, you need boost-build installed.
+To build, you need boost-build and openssl installed.
 
 .. _libtorrent: http://libtorrent.org
 .. _libtorrent-webui: http://www.github.com/arvidn/libtorrent-webui
+
+To build, invoke the command::
+
+	bjam
+
+If you have a directory with boost instead of having it installed, make sure the
+environment variable ``BOOST_ROOT`` is set to that directory and invoke::
+
+	bjam boost=source
+
+This should produce two executables in the root directory of libtorrent-deamon:
+
+* libtorrent-deamon
+* add_user
 
 deploying
 ---------
@@ -43,6 +57,18 @@ directory from the current working directory of the daemon.
 
 To deploy with transmission webui, place the javascript and html files in a
 ``web`` directory in the current working directory of the daemon.
+
+To set up users, use the ``add_user`` command line tool like this:
+
+.. parsed-literal:
+
+	add_user *user-name* *user-group-id*
+
+The group IDs are:
+
+0. admin user, full access
+1. read-only user
+2. limited user (can add and remove torrents, but not change configurations)
 
 command line arguments
 ----------------------

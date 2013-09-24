@@ -17,14 +17,16 @@ exe libtorrent-daemon
 	$(SOURCES).cpp
 
 	: # requirements
-	<library>/torrent//torrent
-	<library>/torrent-webui//torrent-webui
+	<library>/torrent//torrent/<encryption>openssl/<link>static
+	<library>/torrent-webui//torrent-webui/<encryption>openssl/<link>static
 	<toolset>gcc:<linkflags>-export-dynamic
 	<toolset>gcc:<linkflags>-rdynamic
 	<toolset>gcc:<cxxflags>-rdynamic
 
 	: # default build
 	<link>static
-
 	;
+
+install stage_daemon : libtorrent-daemon : <location>. ;
+install stage_add_user : /torrent-webui//add_user/<encryption>openssl/<link>static : <location>. ;
 
