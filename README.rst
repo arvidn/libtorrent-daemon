@@ -85,6 +85,10 @@ Where key is the name of a `libtorrent setting`_.
 In order to make libtorrent-daemon accept webui request over SSL, you need to
 provide a ``.pem``-file to the ``-s`` option.
 
+To generate a certificate, run::
+
+	openssl req -new -x509 -keyout server.pem -out server.pem -days 365 -nodes
+
 The user configuration file supports three levels of users. full access,
 limited access and read only. These categories of users are groups 0, 1 and 2
 respectively. In order to generate a ``users.conf`` file, use the ``add_user``
