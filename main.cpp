@@ -250,7 +250,7 @@ int main(int argc, char *const argv[])
 	ses.apply_settings(s);
 
 	torrent_history hist(&alerts);
-	save_resume resume(ses, ".resume", &alerts);
+	save_resume resume(ses, "resume.dat", &alerts);
 	add_torrent_params p;
 	if (!save_path.empty()) sett.set_str("save_path", save_path);
 	p.save_path = sett.get_str("save_path", ".");
