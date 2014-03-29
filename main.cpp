@@ -11,10 +11,10 @@
 #include "http_whitelist.hpp"
 #include "error_logger.hpp"
 #include "rss_filter.hpp"
+#include "alert_handler.hpp"
 
 #include "libtorrent/session.hpp"
 #include "libtorrent/socket_io.hpp" // for print_endpoint
-#include "libtorrent/alert_handler.hpp"
 #include "libtorrent/extensions/ut_metadata.hpp"
 #include "libtorrent/extensions/ut_pex.hpp"
 
