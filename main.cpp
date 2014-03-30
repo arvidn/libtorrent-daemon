@@ -316,6 +316,13 @@ int main(int argc, char *const argv[])
 
 	if (debug_file) fclose(debug_file);
 
+	// it's important to disable any more alert subscriptions
+	// and cancel the ones in flught now, otherwise the webport
+	// may dead-lock. Some of its threads may be blocked waiting
+	// for alerts. Those alerts aren't likely to ever arrive at
+	// this point.
+	alerts.abort();
+
 //	dlg.stop();
 	webport.stop();
 	sett.save(ec);
