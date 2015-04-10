@@ -2,7 +2,7 @@ import modules ;
 
 BOOST_ROOT = [ modules.peek : BOOST_ROOT ] ;
 
-use-project /torrent : ../libtorrent_aio ;
+use-project /torrent : ../libtorrent_trunk ;
 use-project /torrent-webui : ../libtorrent-webui ;
 
 if $(BOOST_ROOT)
@@ -17,8 +17,8 @@ exe libtorrent-daemon
 	$(SOURCES).cpp
 
 	: # requirements
-	<library>/torrent//torrent/<encryption>openssl/<link>static
-	<library>/torrent-webui//torrent-webui/<encryption>openssl/<link>static
+	<library>/torrent//torrent/<crypto>openssl/<link>static
+	<library>/torrent-webui//torrent-webui/<crypto>openssl/<link>static
 	<toolset>gcc:<linkflags>-export-dynamic
 	<toolset>gcc:<linkflags>-rdynamic
 	<toolset>gcc:<cxxflags>-rdynamic
@@ -28,5 +28,5 @@ exe libtorrent-daemon
 	;
 
 install stage_daemon : libtorrent-daemon : <location>. ;
-install stage_add_user : /torrent-webui//add_user/<encryption>openssl/<link>static : <location>. ;
+install stage_add_user : /torrent-webui//add_user/<crypto>openssl/<link>static : <location>. ;
 
