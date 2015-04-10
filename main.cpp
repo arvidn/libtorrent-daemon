@@ -288,7 +288,7 @@ int main(int argc, char *const argv[])
 	signal(SIGINT, &sighandler);
 	signal(SIGPIPE, SIG_IGN);
 
-	std::deque<alert*> alert_queue;
+	std::vector<alert*> alert_queue;
 	bool shutting_down = false;
 	while (!quit || !resume.ok_to_quit())
 	{
@@ -296,7 +296,7 @@ int main(int argc, char *const argv[])
 		ses.pop_alerts(&alert_queue);
 		if (debug_file)
 		{
-			for (std::deque<alert*>::iterator i = alert_queue.begin()
+			for (std::vector<alert*>::iterator i = alert_queue.begin()
 				, end(alert_queue.end()); i != end; ++i)
 			{
 				fprintf(debug_file, " %s\n", (*i)->message().c_str());
