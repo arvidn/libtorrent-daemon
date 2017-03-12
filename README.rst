@@ -26,9 +26,9 @@ building
 libtorrent-daemon depends on libtorrent_ and libtorrent-webui_.
 
 The Jamfile in the root expects those directories to be checked out
-next to the libtorrentp-daemon directory.
+next to the libtorrent-daemon directory.
 
-libtorrent in turn depend boost, and on openssl( in case it's built with encryption=openssl).
+libtorrent in turn depend boost, and on openssl (in case it's built with encryption=openssl).
 
 To build, you need boost-build and openssl installed.
 

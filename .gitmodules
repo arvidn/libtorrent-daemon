@@ -1,0 +1,6 @@
+[submodule "libtorrent-webui"]
+	path = libtorrent-webui
+	url = https://github.com/arvidn/libtorrent-webui.git
+[submodule "libtorrent"]
+	path = libtorrent
+	url = https://github.com/arvidn/libtorrent.git

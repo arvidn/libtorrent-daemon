@@ -2,8 +2,8 @@ import modules ;
 
 BOOST_ROOT = [ modules.peek : BOOST_ROOT ] ;
 
-use-project /torrent : ../libtorrent ;
-use-project /torrent-webui : ../libtorrent-webui ;
+use-project /torrent : libtorrent ;
+use-project /torrent-webui : libtorrent-webui ;
 
 if $(BOOST_ROOT)
 {
